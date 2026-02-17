@@ -21,35 +21,36 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        for (int i = 0; i < Size; i++)
+        for(int i = 0; i<Size; i++)
         {
-            for (int j = 0; j < Size; j++)
+            for (int j = 0; j< Size; j++)
             {
                 GameMatrix[i, j] = 0;
             }
         }
-
+        
         startPosx = Random.Range(0, Size);
         startPosy = Random.Range(0, Size);
         do
         {
             endPosx = Random.Range(0, Size);
             endPosy = Random.Range(0, Size);
-        } while (endPosx == startPosx || endPosy == startPosy);
+        } while(endPosx== startPosx || endPosy== startPosy);
 
         GameMatrix[startPosx, startPosy] = 2;
         GameMatrix[startPosx, startPosy] = 1;
         NodeMatrix = new Node[Size, Size];
         CreateNodes();
+        PathFindingAStar();
     }
     public void CreateNodes()
     {
-        for (int i = 0; i < Size; i++)
+        for(int i=0; i<Size; i++)
         {
-            for (int j = 0; j < Size; j++)
+            for(int j=0; j<Size; j++)
             {
-                NodeMatrix[i, j] = new Node(i, j, Calculs.CalculatePoint(i, j));
-                NodeMatrix[i, j].Heuristic = Calculs.CalculateHeuristic(NodeMatrix[i, j], endPosx, endPosy);
+                NodeMatrix[i, j] = new Node(i, j, Calculs.CalculatePoint(i,j));
+                NodeMatrix[i,j].Heuristic = Calculs.CalculateHeuristic(NodeMatrix[i,j],endPosx,endPosy);
             }
         }
         for (int i = 0; i < Size; i++)
@@ -59,7 +60,7 @@ public class GameManager : MonoBehaviour
                 SetWays(NodeMatrix[i, j], i, j);
             }
         }
-        DebugMatrix();
+      //  DebugMatrix();
     }
     public void DebugMatrix()
     {
@@ -82,7 +83,7 @@ public class GameManager : MonoBehaviour
     public void SetWays(Node node, int x, int y)
     {
         node.WayList = new List<Way>();
-        if (x > 0)
+        if (x>0)
         {
             node.WayList.Add(new Way(NodeMatrix[x - 1, y], Calculs.LinearDistance));
             if (y > 0)
@@ -90,7 +91,7 @@ public class GameManager : MonoBehaviour
                 node.WayList.Add(new Way(NodeMatrix[x - 1, y - 1], Calculs.DiagonalDistance));
             }
         }
-        if (x < Size - 1)
+        if(x<Size-1)
         {
             node.WayList.Add(new Way(NodeMatrix[x + 1, y], Calculs.LinearDistance));
             if (y > 0)
@@ -98,37 +99,37 @@ public class GameManager : MonoBehaviour
                 node.WayList.Add(new Way(NodeMatrix[x + 1, y - 1], Calculs.DiagonalDistance));
             }
         }
-        if (y > 0)
+        if(y>0)
         {
             node.WayList.Add(new Way(NodeMatrix[x, y - 1], Calculs.LinearDistance));
         }
-        if (y < Size - 1)
+        if (y<Size-1)
         {
             node.WayList.Add(new Way(NodeMatrix[x, y + 1], Calculs.LinearDistance));
-            if (x > 0)
+            if (x>0)
             {
                 node.WayList.Add(new Way(NodeMatrix[x - 1, y + 1], Calculs.DiagonalDistance));
             }
-            if (x < Size - 1)
+            if (x<Size-1)
             {
                 node.WayList.Add(new Way(NodeMatrix[x + 1, y + 1], Calculs.DiagonalDistance));
             }
         }
     }
-    public void PathfindingAStar()
-    {
-        Node nodeInicial = NodeMatrix[startPosx, startPosy];
-        Node nodeFinal = NodeMatrix[endPosx, endPosy];
+    public void PathFindingAStar()
+    { 
+        List<Node> openList = new List<Node>();
+        List<Node> closedList = new List<Node>();
+        Node startNode = NodeMatrix[startPosx, startPosy];
 
-        List<Node> llistaOberta = new List<Node>();
-        Node nodeActual = nodeInicial;
-
-        for (int i = 0; nodeActual.WayList.Count > 0; i++)
+        foreach (var way in startNode.WayList)
         {
-            LlistaOberta = nodeActual.WayList[i];
-            
+            openList.Add(way.NodeDestiny);
+            for (int i = 0; i < openList.Count; i++)
+            {
+               
+            }
         }
-       
+        
     }
-
 }
