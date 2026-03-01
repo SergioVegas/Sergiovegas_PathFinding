@@ -29,5 +29,6 @@ public class Node
         _positionX = positionX;
         _positionY = positionY;
         _realPosition = realPos;
+        _gCost = float.MaxValue;
     }
 }

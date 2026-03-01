@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -10,6 +9,8 @@ public class GameManager : MonoBehaviour
     public int Size;
     public BoxCollider2D Panel;
     public GameObject token;
+    public GameObject start_finalToken;
+    public GameObject wayToken;
     private int[,] GameMatrix; //0 not chosen, 1 player, 2 enemy de momento no hago nada con esto
     private Node[,] NodeMatrix;
     private int startPosx, startPosy;
@@ -118,28 +119,55 @@ public class GameManager : MonoBehaviour
         }
     }
     public void PathFindingAStar()
-    { 
+    {
+        Node startNode = NodeMatrix[startPosx, startPosy];
+        Node finalNode = NodeMatrix[endPosx, endPosy];
+
         List<Node> openList = new List<Node>();
         List<Node> closedList = new List<Node>();
 
-        createToken(startPosx, startPosy);
-        token.GetComponent<UnityEngine.UI.Image>().color = Color.mediumPurple;
-        Node startNode = NodeMatrix[startPosx, startPosy];
-        
-        foreach (var way in startNode.WayList)
+        startNode.GCost = 0;
+        openList.Add(startNode);
+        createToken(startPosx, startPosy, start_finalToken);
+        //token.GetComponent<SpriteRenderer>().color = Color.magenta;
+
+        while (openList.Count>0) 
         {
-            openList.Add(way.NodeDestiny);
-            for (int i = 0; i < openList.Count; i++)
+            Node currentNode = openList.OrderBy(n => n.FCost).First();
+            if (currentNode == finalNode)
+            { 
+                createToken(currentNode.PositionX, currentNode.PositionX, start_finalToken);
+                Debug.Log(currentNode + "Acabado!");
+                return;
+            }
+           
+            closedList.Add(currentNode);
+            createToken(currentNode.PositionX, currentNode.PositionX, wayToken);
+            openList.Remove(currentNode);
+
+            foreach (var way in currentNode.WayList)
             {
-               
+                if (closedList.Contains(way.NodeDestiny)) continue;
+
+                float _newCost = way.Cost + currentNode.GCost;
+                if (_newCost < way.NodeDestiny.GCost)
+                {
+                    way.NodeDestiny.GCost = _newCost;
+                    way.NodeDestiny.NodeParent = currentNode;
+
+                    if (!openList.Contains(way.NodeDestiny))
+                    {
+                        openList.Add(way.NodeDestiny);   
+                        createToken(way.NodeDestiny.PositionX, way.NodeDestiny.PositionY, token);
+                    }
+                }
             }
         }
-        
+
     }
-    public void createToken(int posx, int posy )
+    public void createToken(int posx, int posy, GameObject token)
     {
         Vector3 worldPos = NodeMatrix[posx, posy].RealPosition;
         Instantiate(token, worldPos, Quaternion.identity);
-        token.GetComponent<UnityEngine.UI.Image>().color = Color.darkRed;
     }
 }

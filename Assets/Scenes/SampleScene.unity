@@ -243,6 +243,8 @@ MonoBehaviour:
   Size: 8
   Panel: {fileID: 1593313577}
   token: {fileID: 762362213633481467, guid: d17134a25efa0974991a0fb2f9cab3f0, type: 3}
+  start_finalToken: {fileID: 762362213633481467, guid: 4868427f097de5643b45dca2270963ab, type: 3}
+  wayToken: {fileID: 762362213633481467, guid: 782d45752b37a8848b27e91073e5800d, type: 3}
 --- !u!4 &1495351874
 Transform:
   m_ObjectHideFlags: 0
