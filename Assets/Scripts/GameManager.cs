@@ -135,14 +135,19 @@ public class GameManager : MonoBehaviour
         {
             Node currentNode = openList.OrderBy(n => n.FCost).First();
             if (currentNode == finalNode)
-            { 
-                createToken(currentNode.PositionX, currentNode.PositionX, start_finalToken);
-                Debug.Log(currentNode + "Acabado!");
+            {
+                createToken(currentNode.PositionX, currentNode.PositionY, start_finalToken);
+
+                Node temp = currentNode.NodeParent;
+                while (temp != startNode && temp != null)
+                {
+                    createToken(temp.PositionX, temp.PositionY, wayToken);
+                    temp = temp.NodeParent;
+                }
+                Debug.Log("¡Acabado!");
                 return;
             }
-           
             closedList.Add(currentNode);
-            createToken(currentNode.PositionX, currentNode.PositionX, wayToken);
             openList.Remove(currentNode);
 
             foreach (var way in currentNode.WayList)
