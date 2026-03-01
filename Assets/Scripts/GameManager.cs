@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -120,8 +121,11 @@ public class GameManager : MonoBehaviour
     { 
         List<Node> openList = new List<Node>();
         List<Node> closedList = new List<Node>();
-        Node startNode = NodeMatrix[startPosx, startPosy];
 
+        createToken(startPosx, startPosy);
+        token.GetComponent<UnityEngine.UI.Image>().color = Color.mediumPurple;
+        Node startNode = NodeMatrix[startPosx, startPosy];
+        
         foreach (var way in startNode.WayList)
         {
             openList.Add(way.NodeDestiny);
@@ -131,5 +135,11 @@ public class GameManager : MonoBehaviour
             }
         }
         
+    }
+    public void createToken(int posx, int posy )
+    {
+        Vector3 worldPos = NodeMatrix[posx, posy].RealPosition;
+        Instantiate(token, worldPos, Quaternion.identity);
+        token.GetComponent<UnityEngine.UI.Image>().color = Color.darkRed;
     }
 }
