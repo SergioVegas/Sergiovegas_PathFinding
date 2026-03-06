@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
     public BoxCollider2D Panel;
     public GameObject token;
     public GameObject start_finalToken;
-    public GameObject wayToken;
+    public GameObject finalPathToken;
+    public GameObject closedListToken;
     private int[,] GameMatrix; //0 not chosen, 1 player, 2 enemy de momento no hago nada con esto
     private Node[,] NodeMatrix;
     private int startPosx, startPosy;
@@ -43,7 +44,7 @@ public class GameManager : MonoBehaviour
         GameMatrix[startPosx, startPosy] = 1;
         NodeMatrix = new Node[Size, Size];
         CreateNodes();
-        PathFindingAStar();
+        StartCoroutine(PathFindingAStar());
     }
     public void CreateNodes()
     {
@@ -118,7 +119,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    public void PathFindingAStar()
+    public IEnumerator PathFindingAStar()
     {
         Node startNode = NodeMatrix[startPosx, startPosy];
         Node finalNode = NodeMatrix[endPosx, endPosy];
@@ -128,26 +129,32 @@ public class GameManager : MonoBehaviour
 
         startNode.GCost = 0;
         openList.Add(startNode);
-        createToken(startPosx, startPosy, start_finalToken);
-        //token.GetComponent<SpriteRenderer>().color = Color.magenta;
 
-        while (openList.Count>0) 
+        createToken(startPosx, startPosy, start_finalToken);
+        yield return new WaitForSeconds(0.1f);
+
+        while (openList.Count > 0)
         {
             Node currentNode = openList.OrderBy(n => n.FCost).First();
+
             if (currentNode == finalNode)
             {
                 createToken(currentNode.PositionX, currentNode.PositionY, start_finalToken);
+                yield return new WaitForSeconds(0.1f);
 
                 Node temp = currentNode.NodeParent;
                 while (temp != startNode && temp != null)
                 {
-                    createToken(temp.PositionX, temp.PositionY, wayToken);
+                    createToken(temp.PositionX, temp.PositionY, finalPathToken);
+                    yield return new WaitForSeconds(0.1f);
                     temp = temp.NodeParent;
                 }
-                Debug.Log("¡Acabado!");
-                return;
+                yield break;
             }
+
             closedList.Add(currentNode);
+            createToken(currentNode.PositionX, currentNode.PositionY, closedListToken);
+            yield return new WaitForSeconds(0.1f);
             openList.Remove(currentNode);
 
             foreach (var way in currentNode.WayList)
@@ -155,6 +162,7 @@ public class GameManager : MonoBehaviour
                 if (closedList.Contains(way.NodeDestiny)) continue;
 
                 float _newCost = way.Cost + currentNode.GCost;
+
                 if (_newCost < way.NodeDestiny.GCost)
                 {
                     way.NodeDestiny.GCost = _newCost;
@@ -162,14 +170,17 @@ public class GameManager : MonoBehaviour
 
                     if (!openList.Contains(way.NodeDestiny))
                     {
-                        openList.Add(way.NodeDestiny);   
+                        openList.Add(way.NodeDestiny);
+
                         createToken(way.NodeDestiny.PositionX, way.NodeDestiny.PositionY, token);
+                        createToken(startPosx, startPosy, start_finalToken);
+                        yield return new WaitForSeconds(0.1f);
                     }
                 }
             }
         }
-
     }
+
     public void createToken(int posx, int posy, GameObject token)
     {
         Vector3 worldPos = NodeMatrix[posx, posy].RealPosition;
